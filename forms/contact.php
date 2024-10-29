@@ -1,41 +1,30 @@
 <?php
-  /**
-  * Requires the "PHP Email Form" library
-  * The "PHP Email Form" library is available only in the pro version of the template
-  * The library should be uploaded to: vendor/php-email-form/php-email-form.php
-  * For more info and help: https://bootstrapmade.com/php-email-form/
-  */
+// Your Telegram Bot Token
+$botToken = "7821779346:AAFpshRN2vtdb72hlpbWrUftBkTNj2HzAyc";
+// Your Telegram Chat ID
+$chatId = "2142287302";
 
-  // Replace contact@example.com with your real receiving email address
-  $receiving_email_address = 'contact@example.com';
+// Collect form data
+$name = $_POST['name'];
+$email = $_POST['email'];
+$subject = $_POST['subject'];
+$message = $_POST['message'];
 
-  if( file_exists($php_email_form = '../assets/vendor/php-email-form/php-email-form.php' )) {
-    include( $php_email_form );
-  } else {
-    die( 'Unable to load the "PHP Email Form" Library!');
-  }
+// Format the message for Telegram
+$telegramMessage = "New Contact Form Submission:\n\n" .
+                   "Name: $name\n" .
+                   "Email: $email\n" .
+                   "Subject: $subject\n" .
+                   "Message: $message";
 
-  $contact = new PHP_Email_Form;
-  $contact->ajax = true;
-  
-  $contact->to = $receiving_email_address;
-  $contact->from_name = $_POST['name'];
-  $contact->from_email = $_POST['email'];
-  $contact->subject = $_POST['subject'];
+// Send the message to Telegram
+$telegramUrl = "https://api.telegram.org/bot$botToken/sendMessage";
+$response = file_get_contents($telegramUrl . "?chat_id=" . $chatId . "&text=" . urlencode($telegramMessage));
 
-  // Uncomment below code if you want to use SMTP to send emails. You need to enter your correct SMTP credentials
-  /*
-  $contact->smtp = array(
-    'host' => 'example.com',
-    'username' => 'example',
-    'password' => 'pass',
-    'port' => '587'
-  );
-  */
-
-  $contact->add_message( $_POST['name'], 'From');
-  $contact->add_message( $_POST['email'], 'Email');
-  $contact->add_message( $_POST['message'], 'Message', 10);
-
-  echo $contact->send();
+// Redirect or show a success message
+if ($response) {
+    echo "Message sent successfully!";
+} else {
+    echo "Failed to send message.";
+}
 ?>
