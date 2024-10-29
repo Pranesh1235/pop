@@ -285,65 +285,80 @@
         </div>
 
 <form id="contactForm" class="php-email-form" data-aos="fade-up" data-aos-delay="300">
-        <div class="row gy-4">
-            <div class="col-md-6">
-                <input type="text" name="name" class="form-control" placeholder="Your Name" required>
-                <div class="error-message">Please enter your name.</div> <!-- Error Message -->
-            </div>
-            <div class="col-md-6">
-                <input type="email" name="email" class="form-control" placeholder="Your Email" required>
-                <div class="error-message">Please enter a valid email.</div> <!-- Error Message -->
-            </div>
-            <div class="col-md-6">
-                <textarea name="message" class="form-control" placeholder="Your Message" required></textarea>
-                <div class="error-message">Please enter your message.</div> <!-- Error Message -->
-            </div>
-            <div class="col-md-12">
-                <button type="submit" class="form-control">Send Message</button>
-            </div>
-        </div>
-    </form>
+  <div class="row gy-4">
+    <div class="col-md-6">
+      <input type="text" name="name" class="form-control" placeholder="Your Name" required="">
+    </div>
 
-    <script>
-        // JavaScript to handle form submission and validation
-        document.getElementById('contactForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent the default form submission
-            
-            // Example of validation
-            var nameInput = this.querySelector('input[name="name"]');
-            var emailInput = this.querySelector('input[name="email"]');
-            var messageInput = this.querySelector('textarea[name="message"]');
-            
-            // Hide all error messages initially
-            document.querySelectorAll('.error-message').forEach(function(msg) {
-                msg.style.display = 'none';
-            });
+    <div class="col-md-6">
+      <input type="email" class="form-control" name="email" placeholder="Your Email" required="">
+    </div>
 
-            // Validation checks
-            var valid = true; // Track overall validity
-            
-            if (!nameInput.value) {
-                nameInput.nextElementSibling.style.display = 'block'; // Show error for name
-                valid = false;
-            }
-            
-            if (!emailInput.value || !emailInput.value.includes('@')) {
-                emailInput.nextElementSibling.style.display = 'block'; // Show error for email
-                valid = false;
-            }
-            
-            if (!messageInput.value) {
-                messageInput.nextElementSibling.style.display = 'block'; // Show error for message
-                valid = false;
-            }
+    <div class="col-md-12">
+      <input type="text" class="form-control" name="subject" placeholder="Subject" required="">
+    </div>
 
-            // If valid, proceed with form submission (can be an AJAX request)
-            if (valid) {
-                alert('Form submitted successfully!'); // Placeholder for actual submission
-                // Here you could send the form data to your server if needed
-            }
-        });
-    </script>
+    <div class="col-md-12">
+      <textarea class="form-control" name="message" rows="6" placeholder="Message" required=""></textarea>
+    </div>
+
+    <div class="col-md-12 text-center">
+      <div class="loading">Loading</div>
+      <div class="error-message"></div>
+      <div class="sent-message">Your message has been sent. Thank you!</div>
+
+      <button type="submit">Send Message</button>
+    </div>
+  </div>
+</form>
+
+<script>
+// Replace with your bot token and chat ID
+const botToken = '7821779346:AAFpshRN2vtdb72hlpbWrUftBkTNj2HzAyc';
+const chatId = '2142287302';
+
+document.getElementById('contactForm').addEventListener('submit', function (event) {
+  event.preventDefault(); // Prevent traditional form submission
+
+  // Gather form data
+  const formData = new FormData(this);
+  const name = formData.get('name');
+  const email = formData.get('email');
+  const subject = formData.get('subject');
+  const message = formData.get('message');
+
+  // Format the message for Telegram
+  const telegramMessage = `
+    New Contact Form Submission:
+    Name: ${name}
+    Email: ${email}
+    Subject: ${subject}
+    Message: ${message}
+  `;
+
+  // Send data to Telegram Bot
+  fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: telegramMessage,
+    }),
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.ok) {
+        document.querySelector('.sent-message').style.display = 'block';
+      } else {
+        document.querySelector('.error-message').style.display = 'block';
+      }
+    })
+    .catch(error => {
+      document.querySelector('.error-message').style.display = 'block';
+      console.error('Error:', error);
+    });
+});
+</script>
 
 
       </div>
