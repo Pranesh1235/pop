@@ -286,35 +286,82 @@
           </div>
         </div>
 
-        <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="300">
-          <div class="row gy-4">
+<form id="contactForm" class="php-email-form" data-aos="fade-up" data-aos-delay="300">
+  <div class="row gy-4">
+    <div class="col-md-6">
+      <input type="text" name="name" class="form-control" placeholder="Your Name" required="">
+    </div>
 
-            <div class="col-md-6">
-              <input type="text" name="name" class="form-control" placeholder="Your Name" required="">
-            </div>
+    <div class="col-md-6">
+      <input type="email" class="form-control" name="email" placeholder="Your Email" required="">
+    </div>
 
-            <div class="col-md-6 ">
-              <input type="email" class="form-control" name="email" placeholder="Your Email" required="">
-            </div>
+    <div class="col-md-12">
+      <input type="text" class="form-control" name="subject" placeholder="Subject" required="">
+    </div>
 
-            <div class="col-md-12">
-              <input type="text" class="form-control" name="subject" placeholder="Subject" required="">
-            </div>
+    <div class="col-md-12">
+      <textarea class="form-control" name="message" rows="6" placeholder="Message" required=""></textarea>
+    </div>
 
-            <div class="col-md-12">
-              <textarea class="form-control" name="message" rows="6" placeholder="Message" required=""></textarea>
-            </div>
+    <div class="col-md-12 text-center">
+      <div class="loading">Loading</div>
+      <div class="error-message"></div>
+      <div class="sent-message">Your message has been sent. Thank you!</div>
 
-            <div class="col-md-12 text-center">
-              <div class="loading">Loading</div>
-              <div class="error-message"></div>
-              <div class="sent-message">Your message has been sent. Thank you!</div>
+      <button type="submit">Send Message</button>
+    </div>
+  </div>
+</form>
 
-              <button type="submit">Send Message</button>
-            </div>
+<script>
+// Replace with your bot token and chat ID
+const botToken = '7821779346:AAFpshRN2vtdb72hlpbWrUftBkTNj2HzAyc';
+const chatId = '2142287302';
 
-          </div>
-        </form><!-- End Contact Form -->
+document.getElementById('contactForm').addEventListener('submit', function (event) {
+  event.preventDefault(); // Prevent traditional form submission
+
+  // Gather form data
+  const formData = new FormData(this);
+  const name = formData.get('name');
+  const email = formData.get('email');
+  const subject = formData.get('subject');
+  const message = formData.get('message');
+
+  // Format the message for Telegram
+  const telegramMessage = `
+    New Contact Form Submission:
+    Name: ${name}
+    Email: ${email}
+    Subject: ${subject}
+    Message: ${message}
+  `;
+
+  // Send data to Telegram Bot
+  fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: telegramMessage,
+    }),
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.ok) {
+        document.querySelector('.sent-message').style.display = 'block';
+      } else {
+        document.querySelector('.error-message').style.display = 'block';
+      }
+    })
+    .catch(error => {
+      document.querySelector('.error-message').style.display = 'block';
+      console.error('Error:', error);
+    });
+});
+</script>
+
 
       </div>
 
